@@ -1,0 +1,214 @@
+from typing import ValuesView
+from django.db import models
+from django.db.models.fields import CharField, DateField, Field, IntegerField
+from django.db.models.fields.related import ForeignKey
+
+# Create your models here.
+
+class Production(models.Model):
+    DateOperation=models.DateField(verbose_name="Date de l’opération")
+    NatureOperation=models.CharField(verbose_name="Nature de L'operation", max_length=80)
+    Type=models.CharField(verbose_name="Type de l'opération",max_length=80)
+    Souscripteur=models.CharField(verbose_name="Type de l'opération",max_length=80)
+    NumeroTelephone=models.CharField(verbose_name="Numero de Téléphone", max_length=80)
+    NumeroDossier=models.IntegerField(verbose_name="Numéro de Téléphone")
+    CatAssurance=models.CharField(verbose_name="categorie Assurance", max_length=80)
+    NumeroPolice=models.CharField(verbose_name="Numero Police", max_length=80)
+    NumeroAttestation=models.CharField(verbose_name="Numéro d'attestation",max_length=80)	
+    DateEffet=models.DateField(verbose_name="Date d'effet")
+    DateECHEANCE=models.DateField(verbose_name="Date Echeance")
+    PrimeTotale=models.FloatField(verbose_name="PrimeTotale")
+
+
+
+
+
+class CompteComptable(models.Model):
+    NomCompte=models.CharField(max_length=50)
+    ReferenceComptable=models.CharField(max_length=50)
+    SoldeCompte=models.FloatField(null=True)
+
+    def __str__(self):
+        return self.NomCompte
+
+
+class Fournisseur (models.Model):
+    NomFournisseur=models.CharField(max_length=50)
+    ICE=models.CharField(max_length=50, blank=True)
+    RC=models.CharField(max_length=50,blank=True)
+    NomCompte=models.ForeignKey(CompteComptable, null=True, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.NomFournisseur
+
+
+class Facture(models.Model):
+
+    NumeroFacture=models.CharField(max_length=50)
+    Fournisseur=models.ForeignKey(Fournisseur,null=True, on_delete=models.CASCADE)
+    DateFacture=models.DateField()
+    MontantFacture=models.FloatField()
+    def __str__(self):
+        return self.NumeroFacture
+
+
+
+class Sex(models.Model):
+    Sex=models.CharField(max_length=50)
+    def __str__(self):
+
+
+        return self.Sex
+
+class TypePermis(models.Model):
+    TypePermis=models.CharField(max_length=50)
+    def __str__(self):
+
+        return self.TypePermis
+
+
+class NaturePersonne(models.Model):
+    Nature=models.CharField(max_length=50, verbose_name="Type de Personne : Physique/Morale")
+    def __str__(self):
+
+
+        return self.Nature
+
+class Civilite(models.Model):
+    LibelleCivilite=models.CharField(max_length=50)
+    def __str__(self):
+
+
+        return self.LibelleCivilite
+
+
+class UsageVehicule(models.Model):
+    Usage=models.CharField(max_length=50)
+
+
+    def __str__(self):
+
+        return self.Usage
+
+class Combustion(models.Model):
+    Combustion=CharField(max_length=50)
+
+    def __str__(self):
+
+        return self.Combustion
+
+class Vehicule(models.Model):
+    Immatriculation=models.CharField(max_length=50)
+    Usage=models.ForeignKey(UsageVehicule,on_delete=models.CASCADE)
+    DateImmatriculatiion=models.DateField()
+    Marque=models.CharField(max_length=50)
+    Combustion=ForeignKey(Combustion,on_delete=models.CASCADE)
+    PuissanceFiscale=models.IntegerField()
+    ModeleVoiture=models.CharField(max_length=50)
+    NumeroChassis=models.CharField(max_length=50)
+    NombrePlaces=models.IntegerField()
+    Carrosserie=models.CharField(max_length=50)
+    ValeurNeuf=models.FloatField()
+    ValeurVenale=models.FloatField()
+    ValeurConventionelle=models.FloatField()
+
+    def __str__(self):
+
+        return self.Immatriculation
+
+
+class Personne (models.Model):
+    Nature=models.ForeignKey(NaturePersonne, on_delete=models.CASCADE)
+    CIN=models.CharField(max_length=50)
+    Civilite=models.ForeignKey(Civilite, on_delete=models.CASCADE)
+    Nom=models.CharField(max_length=50)
+    Prenom=models.CharField(max_length=50)
+    DateNaissance=models.DateField()
+    Adresse=models.CharField(max_length=100)
+    Ville=models.CharField(max_length=50)
+    Telephone=models.CharField(max_length=50)
+    email=models.EmailField()
+
+    def __str__(self):
+
+
+        return self.Nom + self.Prenom
+
+class Conducteur(models.Model):
+    Personne =models.ForeignKey(Personne, on_delete=models.CASCADE)
+    Sexe= models.ForeignKey(Sex, on_delete=models.CASCADE)
+    DatePermis=models.DateField()
+    TypePermis=models.ForeignKey(TypePermis, on_delete=models.CASCADE)
+    NumeroPermis=models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.NumeroPermis
+
+
+
+class CompagnieAssurance(models.Model):
+    NomCompagnieAssurance= models.CharField(max_length=50,verbose_name="Compagnie d'assurance")
+
+    def __str__(self):
+
+
+        return self.NomCompagnieAssurance
+
+
+class Assurance(models.Model):
+    NumeroPolice= models.CharField(max_length=50,verbose_name="Numéro de Police ")
+    NumeroAttestation= models.IntegerField(verbose_name="Numéro Attestation")
+    NomCompagnie=models.ForeignKey(CompagnieAssurance,on_delete=models.CASCADE)
+    DateOperation = models.DateField(auto_now=True)
+    NatureOperation = models.CharField(max_length=50, verbose_name="Nature de l'opération")
+    Type = models.CharField(max_length=50)
+    Souscripteur = models.ForeignKey(Personne, on_delete=models.CASCADE,null=True)
+    Conducteur=models.ForeignKey(Conducteur,on_delete=models.CASCADE, null=True)
+    NumeroDossier= models.IntegerField()
+    CategorieAssurance = models.CharField(max_length=50, verbose_name="Categorie Assurance ")
+    DateEffet= models.DateField(verbose_name="Date EFFET")
+    DateEcheance= models.DateField(verbose_name="Date ECHEANCE")
+    PrimeTotale= models.IntegerField()
+    PrimePayee= models.IntegerField()
+    Reste= models.IntegerField()
+    Commission=models.IntegerField()
+
+    def __str__(self):
+
+        return self.NumeroPolice
+
+class ModePaiement(models.Model):
+    ModePaiement=models.CharField(max_length=50)
+    def __str__(self):
+
+
+        return self.ModePaiement
+
+class Paiement (models.Model): 
+    NumeroPolice= models.ForeignKey(Assurance, on_delete=models.CASCADE)
+    TypePaiement= models.ForeignKey(ModePaiement, on_delete=models.CASCADE)
+    MontantPaiement=models.FloatField()
+
+
+class Operation (models.Model):
+    NumeroPolice= models.CharField(max_length=50,verbose_name="Numéro de Police ")
+    NumeroAttestation= models.IntegerField(verbose_name="Numéro Attestation")
+    NomCompagnie=models.ForeignKey(CompagnieAssurance,on_delete=models.CASCADE)
+    DateOperation = models.DateField(auto_now=True)
+    NatureOperation = models.CharField(max_length=50, verbose_name="Nature de l'opération")
+    Type = models.CharField(max_length=50)
+    Souscripteur = models.CharField(max_length=50)
+    NumeroTelephone= models.CharField(max_length=50)
+    NumeroDossier= models.IntegerField()
+    CategorieAssurance = models.CharField(max_length=50, verbose_name="Categorie Assurance ")
+    DateEffet= models.DateField(verbose_name="Date EFFET")
+    DateEcheance= models.DateField(verbose_name="Date ECHEANCE")
+    PrimeTotale= models.IntegerField()
+    PrimePayee= models.IntegerField()
+    Reste= models.IntegerField()
+    Commission=models.IntegerField()
+
+    def __str__(self):
+
+
+        return self.NumeroPolice+" "+self.Souscripteur
